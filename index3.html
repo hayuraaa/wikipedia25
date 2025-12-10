@@ -15,8 +15,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 		<!-- Favicon (http://www.favicon-generator.org/) -->
-		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel="shortcut icon" href="https://wikipedia25.wikimedia.or.id/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="https://wikipedia25.wikimedia.or.id/favicon.ico" type="image/x-icon">
 
 		<!-- Your Google Analytics code goes here -->
 
@@ -33,9 +33,9 @@
 		<link rel="stylesheet" href="https://wikipedia25.wikimedia.or.id/assets/vendor/lightgallery/css/lightgallery.min.css"> <!-- lightGallery CSS (http://sachinchoolur.github.io/lightGallery) -->
 
 		<!-- Template master CSS -->
-		<link rel="stylesheet" href="assets/css/helper.css">
-		<link id="tt-themecss" rel="stylesheet" href="assets/css/theme.css">
-		<link id="tt-light-style" rel="stylesheet" href="assets/css/light-style.css">
+		<link rel="stylesheet" href="https://wikipedia25.wikimedia.or.id/assets/css/helper.css">
+		<link id="tt-themecss" rel="stylesheet" href="https://wikipedia25.wikimedia.or.id/assets/css/theme.css">
+		<link id="tt-light-style" rel="stylesheet" href="https://wikipedia25.wikimedia.or.id/assets/css/light-style.css">
 
 	</head>
 
@@ -186,7 +186,7 @@
 
 									<div class="tt-col-lg-6">
 										<div class="anim-fadeinup margin-top-60 margin-top-lg-0">
-											<img src="assets/img/portfolio/1200/portfolio-1.jpg" alt="Wikipedia 25" style="border-radius: 10px; width: 100%;">
+											<img src="https://wikipedia25.wikimedia.or.id/assets/img/portfolio/1200/portfolio-1.jpg" alt="Wikipedia 25" style="border-radius: 10px; width: 100%;">
 										</div>
 									</div>
 								</div>
@@ -198,7 +198,61 @@
 					</div>
 					<!-- End page content -->
 					
+                    <!-- Section Komentar -->
+                    <div class="tt-section padding-top-xlg-150 padding-bottom-xlg-150">
+                        <div class="tt-section-inner tt-wrap max-width-1200">
+                            
+                            <!-- Heading -->
+                            <div class="tt-heading tt-heading-xlg anim-fadeinup text-center margin-bottom-60">
+                                <h3 class="tt-heading-subtitle">Pesan Untuk Wikipedia</h3>
+                                <h2 class="tt-heading-title">Tinggalkan <span class="text-stroke-light">Kesan</span> Anda</h2>
+                            </div>
 
+                            <!-- Form Komentar -->
+                            <div class="anim-fadeinup margin-top-60">
+                                <div class="tt-contact-form max-width-800" style="margin: 0 auto;">
+                                    <form id="commentForm">
+                                        <div class="tt-row">
+                                            <div class="tt-col-lg-12">
+                                                <div class="margin-bottom-30">
+                                                    <input type="text" 
+                                                        id="name" 
+                                                        name="name"
+                                                        placeholder="Nama Anda (opsional)" 
+                                                        class="tt-form-control">
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="tt-col-lg-12">
+                                                <div class="margin-bottom-30">
+                                                    <textarea id="message" 
+                                                            name="message"
+                                                            placeholder="Tulis pesan Anda di sini..." 
+                                                            required 
+                                                            rows="6"
+                                                            class="tt-form-control"></textarea>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="tt-col-lg-12">
+                                                <div class="text-center">
+                                                    <button type="submit" class="tt-btn tt-btn-light-outline">
+                                                        <span data-hover="KIRIM PESAN">KIRIM PESAN</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <div id="form-message" class="margin-top-30 text-center" style="display: none;"></div>
+                                </div>
+                            </div>
+
+                            <!-- List Komentar -->
+                            <div id="comments-list" class="margin-top-100"></div>
+
+                        </div>
+                    </div>
 
 				</div>
 				<!-- End content wrap -->
@@ -233,9 +287,163 @@
 		<script src="https://wikipedia25.wikimedia.or.id/assets/vendor/jquery.mousewheel.min.js"></script> <!-- A jQuery plugin that adds cross browser mouse wheel support (https://github.com/jquery/jquery-mousewheel) -->
 
 		<!-- Template master JS -->
-		<script src="assets/js/theme.js"></script>
+		<script src="https://wikipedia25.wikimedia.or.id/assets/js/theme.js"></script>
 
+        <script>
+        const API_URL = 'http://localhost:8000/api.php';
 
+        // Load comments saat halaman dibuka
+        document.addEventListener('DOMContentLoaded', () => {
+            loadComments();
+        });
+
+        // Submit form
+        document.getElementById('commentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const message = document.getElementById('message').value.trim();
+            
+            if (!message) {
+                showMessage('Pesan tidak boleh kosong!', 'error');
+                return;
+            }
+            
+            // Disable button saat submit
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const btnSpan = submitBtn.querySelector('span');
+            const originalText = btnSpan.getAttribute('data-hover');
+            submitBtn.disabled = true;
+            btnSpan.textContent = 'MENGIRIM...';
+            btnSpan.setAttribute('data-hover', 'MENGIRIM...');
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        name: name || '', 
+                        message: message 
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Reset form
+                    document.getElementById('commentForm').reset();
+                    
+                    // Show success message
+                    showMessage('Terima kasih! Pesan Anda berhasil dikirim.', 'success');
+                    
+                    // Reload comments
+                    setTimeout(() => {
+                        loadComments();
+                    }, 500);
+                } else {
+                    showMessage('Gagal mengirim pesan: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Terjadi kesalahan: ' + error.message, 'error');
+            } finally {
+                // Enable button kembali
+                submitBtn.disabled = false;
+                btnSpan.textContent = originalText;
+                btnSpan.setAttribute('data-hover', originalText);
+            }
+        });
+
+        // Load dan tampilkan comments
+        async function loadComments() {
+            try {
+                const response = await fetch(API_URL);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayComments(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading comments:', error);
+            }
+        }
+
+        // Display comments
+        function displayComments(comments) {
+            const container = document.getElementById('comments-list');
+            
+            if (comments.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center padding-top-bottom-60">
+                        <p class="text-gray">Belum ada pesan. Jadilah yang pertama!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="max-width-900" style="margin: 0 auto;">
+                    <div class="tt-heading tt-heading-sm margin-bottom-60 text-center">
+                        <h3 class="tt-heading-subtitle">Pesan dari Pengunjung</h3>
+                        <div class="tt-heading-title">${comments.length} Pesan</div>
+                    </div>
+                    
+                    <div class="tt-blog-listing">
+                        ${comments.map(comment => `
+                            <article class="tt-blog-item anim-fadeinup">
+                                <div class="tt-bi-info">
+                                    <div class="tt-bi-meta">
+                                        <span class="tt-bi-author">${escapeHtml(comment.name)}</span>
+                                        <span class="tt-bi-sep"> — </span>
+                                        <span class="tt-bi-date">${formatDate(comment.created_at)}</span>
+                                    </div>
+                                    <p class="margin-top-20">${escapeHtml(comment.message)}</p>
+                                </div>
+                            </article>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show form message
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('form-message');
+            messageDiv.textContent = text;
+            messageDiv.style.display = 'block';
+            messageDiv.style.padding = '20px';
+            
+            if (type === 'success') {
+                messageDiv.style.color = '#4CAF50';
+                messageDiv.style.border = '1px solid rgba(76, 175, 80, 0.3)';
+                messageDiv.style.background = 'rgba(76, 175, 80, 0.1)';
+            } else {
+                messageDiv.style.color = '#ff5252';
+                messageDiv.style.border = '1px solid rgba(255, 82, 82, 0.3)';
+                messageDiv.style.background = 'rgba(255, 82, 82, 0.1)';
+            }
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        </script>
 
 	</body>
 

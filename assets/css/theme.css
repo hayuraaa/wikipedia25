@@ -1855,18 +1855,18 @@ body:not(.tt-boxed) .page-header-inner,
 }
 @media (max-width: 1920px) {
 	.page-header-inner {
-		padding-top: 250px;
+		padding-top: 150px;
 		padding-bottom: 140px;
 	}
 	body.ph-image-on #page-header .page-header-inner {
-		padding-top: 200px;
+		padding-top: 150px;
 		padding-bottom: 140px;
 	}
 
 	/* If page header image does not exist or project info list exist */
 	body:not(.ph-image-on) #page-header .page-header-inner,
 	body.ph-image-on.ph-bg-image-on #page-header .page-header-inner {
-		padding-top: 240px;
+		padding-top: 150px;
 		padding-bottom: 200px;
 	}
 }
